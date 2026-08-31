@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'إدارة الحسابات' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="container">
+    <h1 class="page-title">إدارة حسابات الموظفين</h1>
+    <p class="page-subtitle">تغيير كلمة مرور حساب السكرتير أو موظف النواظير.</p>
+
+    <% if (message) { %><div class="alert success"><%= message %></div><% } %>
+    <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+    <% staff.forEach(function(u) { %>
+      <div class="card">
+        <h2 style="margin-top:0;">
+          <%= u.full_name %>
+          <span class="badge <%= u.role === 'endoscopy' ? 'endoscopy' : 'regular' %>">
+            <%= ({secretary:'سكرتير', endoscopy:'موظف نواظير'})[u.role] %>
+          </span>
+        </h2>
+        <p class="slot-meta">اسم المستخدم: <strong><%= u.username %></strong></p>
+        <form method="post" action="/manager/accounts/<%= u.id %>/password" class="form-grid" style="align-items:flex-end;">
+          <div class="form-field">
+            <label for="password-<%= u.id %>">كلمة مرور جديدة</label>
+            <input type="password" id="password-<%= u.id %>" name="newPassword" minlength="4" required />
+          </div>
+          <div class="form-field">
+            <button type="submit" class="btn">تحديث كلمة المرور</button>
+          </div>
+        </form>
+      </div>
+    <% }) %>
+  </div>
+</body>
+</html>

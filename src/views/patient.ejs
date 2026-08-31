@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'حجز موعد' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="container">
+    <h1 class="page-title">احجز موعدك الآن</h1>
+    <p class="page-subtitle">مواعيد العيادة يوميًا من 5:00 حتى 9:00 مساءً، ما عدا الأربعاء والجمعة. كل موعد لمريض واحد فقط.</p>
+
+    <div class="card">
+      <form method="get" action="/patient" class="date-bar">
+        <div class="form-field">
+          <label for="date">اختر التاريخ</label>
+          <input type="date" id="date" name="date" value="<%= date %>" min="<%= date %>" onchange="this.form.submit()" />
+        </div>
+        <span class="slot-meta">اليوم: <%= weekdayName %></span>
+      </form>
+
+      <% if (isClosed) { %>
+        <div class="closed-banner">
+          العيادة مغلقة يوم <%= weekdayName %> (عطلة الأربعاء والجمعة).
+          أقرب موعد متاح: <a href="/patient?date=<%= nextOpenDate %>"><%= nextOpenDate %></a>
+        </div>
+      <% } else { %>
+        <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+        <form method="post" action="/patient/book">
+          <input type="hidden" name="bookingDate" value="<%= date %>" />
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="slotTime">الموعد المتاح</label>
+              <select id="slotTime" name="slotTime" required>
+                <option value="">اختر موعدًا</option>
+                <% schedule.forEach(function(s) { if (!s.booking) { %>
+                  <option value="<%= s.time %>"><%= s.time %></option>
+                <% } }) %>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="patientName">الاسم الكامل</label>
+              <input type="text" id="patientName" name="patientName" required value="<%= formValues.patientName || '' %>" />
+            </div>
+            <div class="form-field">
+              <label for="patientPhone">رقم الهاتف</label>
+              <input type="tel" id="patientPhone" name="patientPhone" required value="<%= formValues.patientPhone || '' %>" />
+            </div>
+            <div class="form-field">
+              <label for="patientNationalId">الرقم الوطني (اختياري)</label>
+              <input type="text" id="patientNationalId" name="patientNationalId" value="<%= formValues.patientNationalId || '' %>" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="notes">سبب الزيارة / ملاحظات (اختياري)</label>
+            <textarea id="notes" name="notes" rows="2"><%= formValues.notes || '' %></textarea>
+          </div>
+          <button type="submit" class="btn">تأكيد الحجز</button>
+        </form>
+      <% } %>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">المواعيد المتاحة ليوم <%= date %></h2>
+      <div class="slot-grid">
+        <% schedule.forEach(function(s) { %>
+          <div class="slot-card <%= s.booking ? 'taken' : 'available' %>">
+            <div class="slot-time"><%= s.time %></div>
+            <div class="slot-meta"><%= s.booking ? 'محجوز' : 'شاغر' %></div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <p class="footer-note">لديك حجز مسبق؟ <a href="/patient/lookup">استعلم عنه أو ألغِه من هنا</a></p>
+  </div>
+</body>
+</html>

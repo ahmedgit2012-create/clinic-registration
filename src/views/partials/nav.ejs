@@ -1,0 +1,30 @@
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="<%= currentUser ? (currentUser.role === 'manager' ? '/manager' : '/' + currentUser.role) : '/patient' %>">
+      🏥 عيادة - نظام التسجيل والحجز
+    </a>
+    <nav class="nav-links">
+      <% if (currentUser) { %>
+        <% if (currentUser.role === 'manager') { %>
+          <a href="/manager">لوحة المدير</a>
+          <a href="/secretary">واجهة السكرتير</a>
+          <a href="/endoscopy">واجهة النواظير</a>
+          <a href="/patient">واجهة المريض</a>
+          <a href="/manager/accounts">إدارة الحسابات</a>
+        <% } else if (currentUser.role === 'secretary') { %>
+          <a href="/secretary">حجوزات اليوم</a>
+        <% } else if (currentUser.role === 'endoscopy') { %>
+          <a href="/endoscopy">حجوزات النواظير</a>
+        <% } %>
+        <span class="nav-user">مرحبًا، <%= currentUser.fullName %></span>
+        <form action="/logout" method="post" class="inline-form">
+          <button type="submit" class="link-btn">تسجيل الخروج</button>
+        </form>
+      <% } else { %>
+        <a href="/patient">حجز موعد</a>
+        <a href="/patient/lookup">الاستعلام عن حجزي</a>
+        <a href="/login">دخول الموظفين</a>
+      <% } %>
+    </nav>
+  </div>
+</header>

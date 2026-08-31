@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'واجهة النواظير' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="container">
+    <h1 class="page-title">واجهة موظف النواظير</h1>
+    <p class="page-subtitle">حجز مرضى النواظير كل ساعة كاملة (5، 6، 7، 8 مساءً)، وهو يتداخل مع الحجز العام لنفس الموعد.</p>
+
+    <div class="card">
+      <form method="get" action="/endoscopy" class="date-bar">
+        <div class="form-field">
+          <label for="date">التاريخ</label>
+          <input type="date" id="date" name="date" value="<%= date %>" onchange="this.form.submit()" />
+        </div>
+        <span class="slot-meta">اليوم: <%= weekdayName %></span>
+      </form>
+
+      <% if (isClosed) { %>
+        <div class="closed-banner">العيادة مغلقة يوم <%= weekdayName %> (عطلة الأربعاء والجمعة). الرجاء اختيار يوم آخر.</div>
+      <% } else { %>
+        <% if (success) { %><div class="alert success"><%= success %></div><% } %>
+        <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+        <form method="post" action="/endoscopy/book">
+          <input type="hidden" name="bookingDate" value="<%= date %>" />
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="slotTime">الموعد المتاح</label>
+              <select id="slotTime" name="slotTime" required>
+                <option value="">اختر موعدًا</option>
+                <% schedule.forEach(function(s) { if (!s.booking) { %>
+                  <option value="<%= s.time %>"><%= s.time %></option>
+                <% } }) %>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="patientName">اسم المريض</label>
+              <input type="text" id="patientName" name="patientName" required />
+            </div>
+            <div class="form-field">
+              <label for="patientPhone">رقم الهاتف</label>
+              <input type="tel" id="patientPhone" name="patientPhone" required />
+            </div>
+            <div class="form-field">
+              <label for="patientNationalId">الرقم الوطني (اختياري)</label>
+              <input type="text" id="patientNationalId" name="patientNationalId" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="notes">ملاحظات (اختياري)</label>
+            <textarea id="notes" name="notes" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn">تسجيل حجز الناظور</button>
+        </form>
+      <% } %>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">مواعيد النواظير ليوم <%= date %></h2>
+      <div class="slot-grid">
+        <% schedule.forEach(function(s) { %>
+          <div class="slot-card <%= s.booking ? 'taken ' + s.booking.booking_type : 'available' %>">
+            <div class="slot-time"><%= s.time %></div>
+            <% if (s.booking) { %>
+              <div class="slot-patient"><%= s.booking.patient_name %></div>
+              <div class="slot-meta"><%= s.booking.patient_phone %></div>
+              <div class="slot-meta">
+                <span class="badge <%= s.booking.booking_type %>"><%= s.booking.booking_type === 'endoscopy' ? 'ناظور' : 'حجز عام (غير ناظور)' %></span>
+              </div>
+              <% if (s.booking.booking_type === 'endoscopy') { %>
+                <div class="slot-actions">
+                  <form method="post" action="/endoscopy/cancel/<%= s.booking.id %>" onsubmit="return confirm('تأكيد إلغاء حجز المريض <%= s.booking.patient_name %>؟');">
+                    <input type="hidden" name="bookingDate" value="<%= date %>" />
+                    <button type="submit" class="btn danger small">إلغاء الحجز</button>
+                  </form>
+                </div>
+              <% } %>
+            <% } else { %>
+              <div class="slot-meta">شاغر</div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

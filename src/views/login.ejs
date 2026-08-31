@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'تسجيل الدخول' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="login-wrap">
+    <div class="card login-card">
+      <h1>تسجيل دخول الموظفين</h1>
+      <p class="page-subtitle">للسكرتير، موظف النواظير، والمدير.</p>
+      <% if (error) { %>
+        <div class="alert error"><%= error %></div>
+      <% } %>
+      <form method="post" action="/login" style="text-align: right;">
+        <div class="form-field">
+          <label for="username">اسم المستخدم</label>
+          <input type="text" id="username" name="username" value="<%= username %>" required autofocus />
+        </div>
+        <div class="form-field">
+          <label for="password">كلمة المرور</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit" class="btn" style="width:100%; margin-top: 10px;">دخول</button>
+      </form>
+    </div>
+    <p class="footer-note">هل أنت مريض وتريد حجز موعد؟ <a href="/patient">اضغط هنا للحجز الإلكتروني</a></p>
+  </div>
+</body>
+</html>

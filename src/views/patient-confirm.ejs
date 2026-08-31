@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'تم تأكيد الحجز' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="container">
+    <div class="card" style="text-align:center;">
+      <h1 class="page-title">✅ تم تأكيد حجزك</h1>
+      <p>احتفظ برمز المرجع التالي لاستخدامه عند الاستعلام عن حجزك أو إلغائه:</p>
+      <div class="reference-code"><%= booking.reference_code %></div>
+      <table class="data-table" style="text-align: right; margin-top: 20px;">
+        <tr><th>اسم المريض</th><td><%= booking.patient_name %></td></tr>
+        <tr><th>التاريخ</th><td><%= booking.booking_date %> (<%= weekdayName %>)</td></tr>
+        <tr><th>الوقت</th><td><%= booking.slot_time %></td></tr>
+        <tr><th>رقم الهاتف</th><td><%= booking.patient_phone %></td></tr>
+      </table>
+      <p style="margin-top: 20px;">
+        <a class="btn" href="/patient">حجز موعد آخر</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

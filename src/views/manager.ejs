@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'لوحة المدير' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="container">
+    <h1 class="page-title">لوحة المدير</h1>
+    <p class="page-subtitle">نظرة شاملة على جميع الحجوزات، مع إمكانية فتح كل واجهات النظام.</p>
+
+    <div class="card">
+      <form method="get" action="/manager" class="date-bar">
+        <div class="form-field">
+          <label for="date">التاريخ</label>
+          <input type="date" id="date" name="date" value="<%= date %>" onchange="this.form.submit()" />
+        </div>
+        <span class="slot-meta">اليوم: <%= weekdayName %><%= isClosed ? ' (يوم إغلاق)' : '' %></span>
+      </form>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value"><%= stats.regularBooked %>/<%= stats.regularTotal %></div>
+          <div class="stat-label">حجوزات عامة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= stats.endoscopyBooked %>/<%= stats.endoscopyTotal %></div>
+          <div class="stat-label">حجوزات نواظير</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= stats.regularAvailable %></div>
+          <div class="stat-label">مواعيد شاغرة</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">جميع حجوزات يوم <%= date %></h2>
+      <% if (isClosed) { %>
+        <div class="closed-banner">العيادة مغلقة هذا اليوم (الأربعاء والجمعة عطلة).</div>
+      <% } %>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>الوقت</th>
+              <th>النوع</th>
+              <th>المريض</th>
+              <th>الهاتف</th>
+              <th>مصدر الحجز</th>
+              <th>إجراء</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% schedule.forEach(function(s) { %>
+              <tr>
+                <td><%= s.time %><%= s.isHourly ? ' <span class="slot-hourly-badge">ساعة</span>' : '' %></td>
+                <% if (s.booking) { %>
+                  <td><span class="badge <%= s.booking.booking_type %>"><%= s.booking.booking_type === 'endoscopy' ? 'ناظور' : 'حجز عام' %></span></td>
+                  <td><%= s.booking.patient_name %></td>
+                  <td><%= s.booking.patient_phone %></td>
+                  <td><%= ({secretary:'سكرتير', patient:'المريض نفسه', endoscopy_staff:'موظف النواظير', manager:'المدير'})[s.booking.source] || s.booking.source %></td>
+                  <td>
+                    <form method="post" action="/manager/cancel/<%= s.booking.id %>" onsubmit="return confirm('تأكيد إلغاء حجز المريض <%= s.booking.patient_name %>؟');">
+                      <input type="hidden" name="bookingDate" value="<%= date %>" />
+                      <button type="submit" class="btn danger small">إلغاء</button>
+                    </form>
+                  </td>
+                <% } else { %>
+                  <td colspan="4" class="slot-meta">شاغر</td>
+                  <td></td>
+                <% } %>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0;">اختصارات</h2>
+      <p>
+        <a class="btn" href="/secretary">فتح واجهة السكرتير</a>
+        <a class="btn secondary" href="/endoscopy">فتح واجهة النواظير</a>
+        <a class="btn secondary" href="/patient">فتح واجهة المريض</a>
+        <a class="btn" style="background:#374151;" href="/manager/accounts">إدارة حسابات الموظفين</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

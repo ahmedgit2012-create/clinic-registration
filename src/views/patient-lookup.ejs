@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <%- include('partials/head', { title: 'الاستعلام عن حجز' }) %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+  <div class="container">
+    <h1 class="page-title">الاستعلام عن حجزي / إلغاؤه</h1>
+    <div class="card">
+      <% if (typeof cancelled !== 'undefined' && cancelled) { %>
+        <div class="alert success">تم إلغاء الحجز بنجاح.</div>
+      <% } %>
+      <% if (error) { %><div class="alert error"><%= error %></div><% } %>
+
+      <form method="post" action="/patient/lookup">
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="referenceCode">رمز المرجع</label>
+            <input type="text" id="referenceCode" name="referenceCode" required />
+          </div>
+          <div class="form-field">
+            <label for="patientPhone">رقم الهاتف المستخدم عند الحجز</label>
+            <input type="tel" id="patientPhone" name="patientPhone" required />
+          </div>
+        </div>
+        <button type="submit" class="btn">بحث</button>
+      </form>
+
+      <% if (searched && booking) { %>
+        <table class="data-table" style="margin-top: 20px;">
+          <tr><th>اسم المريض</th><td><%= booking.patient_name %></td></tr>
+          <tr><th>التاريخ</th><td><%= booking.booking_date %></td></tr>
+          <tr><th>الوقت</th><td><%= booking.slot_time %></td></tr>
+          <tr><th>الحالة</th><td><%= booking.status === 'confirmed' ? 'مؤكد' : 'ملغى' %></td></tr>
+        </table>
+        <form method="post" action="/patient/lookup/cancel/<%= booking.id %>" style="margin-top: 12px;" onsubmit="return confirm('تأكيد إلغاء هذا الحجز؟');">
+          <input type="hidden" name="referenceCode" value="<%= booking.reference_code %>" />
+          <input type="hidden" name="patientPhone" value="<%= booking.patient_phone %>" />
+          <button type="submit" class="btn danger">إلغاء هذا الحجز</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
