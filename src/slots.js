@@ -76,6 +76,16 @@ function hourlySlotTimes() {
   return allSlotTimes().filter(isHourlySlot);
 }
 
+/** يحول "HH:MM" (نظام 24 ساعة) إلى صيغة 12 ساعة بالعربية، مثل "5:00 مساءً" */
+function formatTime12(time) {
+  const [hStr, mStr] = String(time).split(':');
+  const h = parseInt(hStr, 10);
+  const period = h >= 12 ? 'مساءً' : 'صباحًا';
+  let h12 = h % 12;
+  if (h12 === 0) h12 = 12;
+  return `${h12}:${mStr} ${period}`;
+}
+
 /** أقرب تاريخ متاح (غير مغلق) ابتداءً من التاريخ المعطى */
 function nextOpenDate(fromDateStr) {
   let d = parseDateOnly(fromDateStr);
@@ -103,4 +113,5 @@ module.exports = {
   isHourlySlot,
   hourlySlotTimes,
   nextOpenDate,
+  formatTime12,
 };

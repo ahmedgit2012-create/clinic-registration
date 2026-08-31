@@ -13,7 +13,7 @@
       <table class="data-table" style="text-align: right; margin-top: 20px;">
         <tr><th>اسم المريض</th><td><%= booking.patient_name %></td></tr>
         <tr><th>التاريخ</th><td><%= booking.booking_date %> (<%= weekdayName %>)</td></tr>
-        <tr><th>الوقت</th><td><%= booking.slot_time %></td></tr>
+        <tr><th>الوقت</th><td><%= formatTime12(booking.slot_time) %></td></tr>
         <tr><th>رقم الهاتف</th><td><%= booking.patient_phone %></td></tr>
       </table>
       <p style="margin-top: 20px;">

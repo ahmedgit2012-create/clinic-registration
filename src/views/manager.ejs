@@ -54,7 +54,7 @@
           <tbody>
             <% schedule.forEach(function(s) { %>
               <tr>
-                <td><%= s.time %><%= s.isHourly ? ' <span class="slot-hourly-badge">ساعة</span>' : '' %></td>
+                <td><%= formatTime12(s.time) %><%- s.isHourly ? ' <span class="slot-hourly-badge">ساعة</span>' : '' %></td>
                 <% if (s.booking) { %>
                   <td><span class="badge <%= s.booking.booking_type %>"><%= s.booking.booking_type === 'endoscopy' ? 'ناظور' : 'حجز عام' %></span></td>
                   <td><%= s.booking.patient_name %></td>

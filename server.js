@@ -6,6 +6,7 @@ const express = require('express');
 const session = require('express-session');
 
 require('./src/db'); // تهيئة قاعدة البيانات والجداول
+const { formatTime12 } = require('./src/slots');
 
 const authRoutes = require('./src/routes/auth');
 const secretaryRoutes = require('./src/routes/secretary');
@@ -17,6 +18,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src', 'views'));
+app.locals.formatTime12 = formatTime12;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
