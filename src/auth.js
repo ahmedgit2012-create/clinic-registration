@@ -19,7 +19,25 @@ function verifyPassword(password, stored) {
   return crypto.timingSafeEqual(hashBuf, candidateBuf);
 }
 
+/**
+ * تعطيل مؤقت لتسجيل الدخول على مستوى كل الموقع (DISABLE_AUTH=true في .env).
+ * عند التفعيل: أي زائر يُعامل تلقائيًا كمدير (صلاحية كاملة على كل الصفحات)
+ * دون الحاجة لاسم مستخدم أو كلمة مرور. هذا الخيار مخصص للتجربة السريعة فقط
+ * ويجب إلغاؤه (حذف المتغيّر أو ضبطه على false) قبل الاستخدام الفعلي.
+ */
+function isAuthDisabled() {
+  return process.env.DISABLE_AUTH === 'true';
+}
+
+function guestManagerUser() {
+  return { id: 0, role: 'manager', fullName: 'وضع بدون تسجيل دخول (مؤقت)', username: 'guest' };
+}
+
 function requireAuth(req, res, next) {
+  if (isAuthDisabled()) {
+    req.session.user = req.session.user || guestManagerUser();
+    return next();
+  }
   if (!req.session.user) {
     return res.redirect('/login');
   }
@@ -29,6 +47,10 @@ function requireAuth(req, res, next) {
 /** يسمح بالدخول لصاحب الدور المطلوب أو للمدير (الذي يفتح كل الصفحات) */
 function requireRole(...roles) {
   return (req, res, next) => {
+    if (isAuthDisabled()) {
+      req.session.user = req.session.user || guestManagerUser();
+      return next();
+    }
     const user = req.session.user;
     if (!user) return res.redirect('/login');
     if (roles.includes(user.role) || user.role === 'manager') return next();
@@ -43,4 +65,12 @@ function referenceCode() {
   return crypto.randomBytes(4).toString('hex').toUpperCase();
 }
 
-module.exports = { hashPassword, verifyPassword, requireAuth, requireRole, referenceCode };
+module.exports = {
+  hashPassword,
+  verifyPassword,
+  requireAuth,
+  requireRole,
+  referenceCode,
+  isAuthDisabled,
+  guestManagerUser,
+};

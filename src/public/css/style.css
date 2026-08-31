@@ -187,6 +187,15 @@ table.data-table th { color: var(--muted); font-weight: 600; background: #fafbfc
   margin: 10px 0;
 }
 
+.auth-disabled-banner {
+  background: #fef3c7;
+  color: #78350f;
+  text-align: center;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: .85rem;
+}
+
 .closed-banner {
   background: var(--danger-light);
   border: 1px solid #fecaca;

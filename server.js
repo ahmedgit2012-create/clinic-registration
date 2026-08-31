@@ -7,6 +7,7 @@ const session = require('express-session');
 
 require('./src/db'); // تهيئة قاعدة البيانات والجداول
 const { formatTime12 } = require('./src/slots');
+const { isAuthDisabled, guestManagerUser } = require('./src/auth');
 
 const authRoutes = require('./src/routes/auth');
 const secretaryRoutes = require('./src/routes/secretary');
@@ -36,7 +37,11 @@ app.use(
 );
 
 app.use((req, res, next) => {
+  if (isAuthDisabled() && !req.session.user) {
+    req.session.user = guestManagerUser();
+  }
   res.locals.currentUser = req.session.user || null;
+  res.locals.authDisabled = isAuthDisabled();
   next();
 });
 

@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const users = require('../db/users');
-const { verifyPassword } = require('../auth');
+const { verifyPassword, isAuthDisabled } = require('../auth');
 
 const ROLE_HOME = {
   secretary: '/secretary',
@@ -12,6 +12,9 @@ const ROLE_HOME = {
 };
 
 router.get('/login', (req, res) => {
+  if (isAuthDisabled()) {
+    return res.redirect('/manager');
+  }
   if (req.session.user) {
     return res.redirect(ROLE_HOME[req.session.user.role] || '/');
   }
@@ -32,10 +35,13 @@ router.post('/login', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/login'));
+  req.session.destroy(() => res.redirect(isAuthDisabled() ? '/manager' : '/login'));
 });
 
 router.get('/', (req, res) => {
+  if (isAuthDisabled()) {
+    return res.redirect('/manager');
+  }
   if (req.session.user) {
     return res.redirect(ROLE_HOME[req.session.user.role] || '/login');
   }
